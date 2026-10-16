@@ -41,20 +41,34 @@ export interface StaffCount {
 
 /** Every department, ordered by name. */
 export async function listDepartments(): Promise<Department[]> {
-  // TODO
-  throw new Error('not implemented');
+  const { rows } = await pool.query<Department>(
+    `SELECT dept_name AS "deptName", building, budget 
+    FROM department 
+    ORDER BY dept_name`
+  );
+  return rows;
 }
-
 /** One instructor, or undefined when there is no such id. */
 export async function findInstructor(id: string): Promise<Instructor | undefined> {
-  // TODO
-  throw new Error('not implemented');
+  const { rows } = await pool.query<Instructor>(
+    `SELECT id, name, dept_name AS "deptName", salary 
+    FROM instructor 
+    WHERE id = $1`, // first argument: the SQL
+    [id]  // second argument: the values
+  );
+  return rows.length > 0 ? rows[0] : undefined;
 }
 
 /** The instructors of one department, ordered by name. */
 export async function instructorsIn(deptName: string): Promise<Instructor[]> {
-  // TODO
-  throw new Error('not implemented');
+  const { rows } = await pool.query<Instructor>(
+    `SELECT id, name, dept_name AS "deptName", salary 
+    FROM instructor
+    WHERE dept_name = $1 
+    ORDER BY name`,
+    [deptName]
+  );
+  return rows;
 }
 
 // --- 2b. Aggregating ------------------------------------------------------
@@ -66,8 +80,14 @@ export async function instructorsIn(deptName: string): Promise<Instructor[]> {
  * count(*) comes back as a string unless you cast it: count(*)::int
  */
 export async function staffCount(): Promise<StaffCount[]> {
-  // TODO
-  throw new Error('not implemented');
+  const { rows } = await pool.query<StaffCount>(
+    `SELECT dept_name AS "deptName", 
+    COUNT(*)::int AS staff 
+    FROM instructor 
+    GROUP BY dept_name 
+    ORDER BY dept_name`
+  );
+  return rows;
 }
 
 // --- 3. A join ------------------------------------------------------------
@@ -79,8 +99,14 @@ export async function staffCount(): Promise<StaffCount[]> {
  * Two tables, joined on dept_name.
  */
 export async function instructorsWithBuilding(): Promise<{ name: string; building: string }[]> {
-  // TODO
-  throw new Error('not implemented');
+  const { rows } = await pool.query<{ name: string; building: string }>(
+    `SELECT i.name,d.building 
+    FROM instructor i 
+    JOIN department d 
+    ON i.dept_name = d.dept_name 
+    ORDER BY i.name`
+  );
+  return rows;
 }
 
 // --- 4. Writing -----------------------------------------------------------
@@ -90,8 +116,13 @@ export async function instructorsWithBuilding(): Promise<{ name: string; buildin
  * Use RETURNING rather than a second query.
  */
 export async function insertInstructor(instructor: Instructor): Promise<Instructor> {
-  // TODO
-  throw new Error('not implemented');
+  const { rows } = await pool.query<Instructor>(
+    `INSERT INTO instructor (id, name, dept_name, salary)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id, name, dept_name AS "deptName", salary`,
+    [instructor.id, instructor.name, instructor.deptName, instructor.salary]
+  );
+  return rows[0];
 }
 
 /**
@@ -99,8 +130,14 @@ export async function insertInstructor(instructor: Instructor): Promise<Instruct
  * there is no such instructor.
  */
 export async function raiseSalary(id: string, amount: number): Promise<Instructor | undefined> {
-  // TODO
-  throw new Error('not implemented');
+    const { rows } = await pool.query<Instructor>(
+      `UPDATE instructor
+       SET salary = salary + $2
+       WHERE id = $1
+       RETURNING id, name, dept_name AS "deptName", salary`,
+      [id, amount]
+    );
+    return rows.length > 0 ? rows[0] : undefined;
 }
 
 /**
@@ -108,6 +145,10 @@ export async function raiseSalary(id: string, amount: number): Promise<Instructo
  * to delete. The query result tells you how many rows it touched.
  */
 export async function deleteInstructor(id: string): Promise<boolean> {
-  // TODO
-  throw new Error('not implemented');
+    const { rows } = await pool.query<Instructor>(
+      `DELETE FROM instructor WHERE id = $1
+       RETURNING id, name, dept_name AS "deptName", salary`, 
+       [id]
+      );
+    return rows.length > 0; 
 }

@@ -7,44 +7,44 @@
 // Uncomment each block as you get to it.
 
 import { pool } from './db.js';
-// import {
-//   listDepartments, findInstructor, instructorsIn, staffCount,
-//   instructorsWithBuilding, insertInstructor, raiseSalary, deleteInstructor,
-// } from './queries.js';
-// import { budgetOf, transferWithoutTransaction, transferBudget } from './transaction.js';
+import {
+  listDepartments, findInstructor, instructorsIn, staffCount,
+  instructorsWithBuilding, insertInstructor, raiseSalary, deleteInstructor,
+} from './queries.js';
+import { budgetOf, transferWithoutTransaction, transferBudget } from './transaction.js';
 
 // --- 2a: reading ---
-// console.log((await listDepartments()).length);                 // 7
-// console.log((await listDepartments())[0]);
+console.log((await listDepartments()).length);                 // 7
+console.log((await listDepartments())[0]);
 //   { deptName: 'Biology', building: 'Watson', budget: 90000 }
-// console.log(await findInstructor('22222'));
+console.log(await findInstructor('22222'));
 //   { id: '22222', name: 'Einstein', deptName: 'Physics', salary: 95000 }
-// console.log(await findInstructor('99999'));                    // undefined
-// console.log((await instructorsIn('Comp. Sci.')).map(i => i.name));
+console.log(await findInstructor('99999'));                    // undefined
+console.log((await instructorsIn('Comp. Sci.')).map(i => i.name));
 //   [ 'Brandt', 'Katz', 'Srinivasan' ]
-// console.log(await instructorsIn('Nursing'));                   // []
+console.log(await instructorsIn('Nursing'));                   // []
 
 // --- 2b: aggregating ---
-// console.log(await staffCount());
+console.log(await staffCount());
 //   [ { deptName: 'Biology', staff: 1 }, { deptName: 'Comp. Sci.', staff: 3 }, ... ]
-// console.log(typeof (await staffCount())[0].staff);             // number, not string
+console.log(typeof (await staffCount())[0].staff);             // number, not string
 
 // --- 3: a join ---
-// console.log((await instructorsWithBuilding())[0]);
+console.log((await instructorsWithBuilding())[0]);
 //   { name: 'Brandt', building: 'Taylor' }
 
 // --- 4: writing ---
 // The three of these belong together: the last one puts the database back
 // the way it was, so you can run this file as often as you like.
-// const added = await insertInstructor(
-//   { id: '99999', name: 'Nobody', deptName: 'Music', salary: 50000 });
-// console.log(added);
+const added = await insertInstructor(
+  { id: '99999', name: 'Nobody', deptName: 'Music', salary: 50000 });
+console.log(added);
 //   { id: '99999', name: 'Nobody', deptName: 'Music', salary: 50000 }
-// console.log(await raiseSalary('99999', 5000));
+console.log(await raiseSalary('99999', 5000));
 //   { id: '99999', name: 'Nobody', deptName: 'Music', salary: 55000 }
-// console.log(await raiseSalary('00000', 5000));                 // undefined
-// console.log(await deleteInstructor('99999'));                  // true
-// console.log(await deleteInstructor('99999'));                  // false
+console.log(await raiseSalary('00000', 5000));                 // undefined
+console.log(await deleteInstructor('99999'));                  // true
+console.log(await deleteInstructor('99999'));                  // false
 
 // --- 5: your own function in the database ---
 // Write danish_grade in functions.sql first, in pgAdmin.
